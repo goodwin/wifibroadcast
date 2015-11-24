@@ -2,15 +2,22 @@ tinkering with befinitiv's wifibroadcast project
 
 (send video thru 802.11 STA via packet injection, for RC FPV)
 
-##Original Project
 https://bitbucket.org/befi/wifibroadcast
 https://befinitiv.wordpress.com/
+
+##How?
+* raspbian comes with a utility that reads video: raspivid
+* raspivid's output gets piped into the tx portion of this project
 
 ##Steps
 * install libpcap (eg Ubuntu: `sudo apt-get install libpcap-dev`)
 * compile `make`
-* run it `./tx` or `./rx`
-* setup auto start (see ./scripts)
+* run it `./tx` or `./rx` (see ./scripts/tx.sh for example)
+** ifconfig wlan0 down
+** iw dev wlan0 set monitor otherbss fcsfail
+** ifconfig wlan0 up
+** iwconfig wlan0 channel 11
+* setup auto start (see ./scripts/systemd)
 
 ##Other Notes
 ###mounting partitions within raspi images
