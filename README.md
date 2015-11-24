@@ -13,13 +13,21 @@ https://befinitiv.wordpress.com/
 * install libpcap (eg Ubuntu: `sudo apt-get install libpcap-dev`)
 * compile `make`
 * run it `./tx` or `./rx` (see ./scripts/tx.sh for example)
-** ifconfig wlan0 down
-** iw dev wlan0 set monitor otherbss fcsfail
-** ifconfig wlan0 up
-** iwconfig wlan0 channel 11
+  * ifconfig wlan0 down
+  * iw dev wlan0 set monitor otherbss fcsfail
+  * ifconfig wlan0 up
+  * iwconfig wlan0 channel 11
 * setup auto start (see ./scripts/systemd)
 
 ##Other Notes
+###testing the TL-WN722N (AR9271 Rev:1) in Ubuntu
+```
+ifconfig wlan0 up
+iw dev wlan0 set monitor otherbss fcsfail
+ifconfig wlan0 up
+iwconfig wlan0 channel 11
+```
+and now verify packets using `tcpdump` or `wireshark`
 ###mounting partitions within raspi images
 * fdisk -l TX_2015-09-24-raspbian-jessie.img (should show FAT boot and Linux/ext4 system)
 * example:
