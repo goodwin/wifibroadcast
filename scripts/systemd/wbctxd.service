@@ -1,0 +1,12 @@
+[Unit]
+Description=wbctxd
+After=multi-user.target
+
+[Service]
+TimeoutStartSec=0
+ExecStart=/home/pi/wifibroadcast_fpv_scripts/tx.sh
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+

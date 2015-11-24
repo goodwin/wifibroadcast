@@ -1,0 +1,11 @@
+[Unit]
+Description=shutdown
+After=multi-user.target
+
+[Service]
+TimeoutStartSec=0
+ExecStart=/home/pi/wifibroadcast_fpv_scripts/shutdown.sh
+
+[Install]
+WantedBy=multi-user.target
+

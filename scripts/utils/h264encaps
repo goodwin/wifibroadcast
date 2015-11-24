@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+# This script converts a file containing raw h264 NALUs to an encapsulated format (like .avi for example)
+#usage: h264encaps <fps> <input file> <output file.avi>
+
+
+#TODO check number of arguments
+
+
+
+avconv -framerate $1 -i $2 -codec copy $3

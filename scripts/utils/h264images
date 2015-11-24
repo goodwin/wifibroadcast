@@ -1,0 +1,12 @@
+#!/bin/bash
+
+
+# This script converts a file containing raw h264 NALUs into jpeg files
+
+#usage: h264images <input file> <output filename(s) with %d for frame number>
+
+
+#TODO: check number of input arguments
+
+gst-launch-1.0 filesrc location="$1" ! h264parse ! avdec_h264 ! jpegenc ! multifilesink location="$2"
+

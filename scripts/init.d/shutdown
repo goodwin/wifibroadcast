@@ -1,0 +1,30 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          shutdown
+# Required-Start:
+# Required-Stop:    
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: shutdown by gpio event
+# Description:      
+### END INIT INFO
+ 
+# Actions
+case "$1" in
+    start)
+        # START
+        /home/pi/wifibroadcast_fpv_scripts/shutdown.sh &
+        ;;
+    stop)
+        # STOP
+        killall shutdown.sh
+        ;;
+    restart)
+        # RESTART
+	killall shutdown.sh
+        /home/pi/wifibroadcast_fpv_scripts/shutdown.sh &
+	;;
+esac
+ 
+exit 0
+

@@ -1,0 +1,30 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          osd
+# Required-Start:    wbcrxd 
+# Required-Stop:    
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: osd rx daemon
+# Description:       starts osd rx daemon
+### END INIT INFO
+ 
+# Actions
+case "$1" in
+    start)
+        # START
+        /home/pi/wifibroadcast_fpv_scripts/osd.sh > /dev/null &
+        ;;
+    stop)
+        # STOP
+        killall frsky_omx_osd
+        ;;
+    restart)
+        # RESTART
+				killall frsky_omx_osd
+        /home/pi/wifibroadcast_fpv_scripts/osd.sh > /dev/null &
+        ;;
+esac
+ 
+exit 0
+

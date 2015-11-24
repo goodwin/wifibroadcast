@@ -1,0 +1,30 @@
+#!/bin/sh
+### BEGIN INIT INFO
+# Provides:          wbcrxd
+# Required-Start:    
+# Required-Stop:    
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: wifibroadcast rx daemon
+# Description:       starts wifibroadcast rx daemon
+### END INIT INFO
+ 
+# Actions
+case "$1" in
+    start)
+        # START
+        /home/pi/wifibroadcast_fpv_scripts/rx.sh > /dev/null &
+        ;;
+    stop)
+        # STOP
+        killall hello_video.bin
+        ;;
+    restart)
+        # RESTART
+				killall hello_video.bin
+        /home/pi/wifibroadcast_fpv_scripts/rx.sh > /dev/null &
+        ;;
+esac
+ 
+exit 0
+
