@@ -10,7 +10,8 @@ https://befinitiv.wordpress.com/
 * raspivid's output gets piped into the tx portion of this project
 
 ##Steps
-* install libpcap (eg Ubuntu: `sudo apt-get install libpcap-dev`)
+* install libpcap `sudo apt-get install libpcap-dev`
+* install iw `sudo apt-get install iw`
 * compile `make`
 * run it `./tx` or `./rx` (see ./scripts/tx.sh for example)
   * ifconfig wlan0 down
