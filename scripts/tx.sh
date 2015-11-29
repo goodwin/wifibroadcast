@@ -4,7 +4,7 @@
 
 #adapt these to your needs
 NIC="wlan1"
-CHANNEL="6"
+CHANNEL="1"
 
 WIDTH=1280
 HEIGHT=720
