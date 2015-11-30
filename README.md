@@ -12,7 +12,10 @@ https://befinitiv.wordpress.com/
 ##Steps
 * install libpcap `sudo apt-get install libpcap-dev`
 * install iw `sudo apt-get install iw`
-* compile `make`
+* patch firmware `sudo cp ./patches/AR9271/firmware/htc_9271.fw over /lib/firmware/htc_9271.fw`
+* compile lib ilclient `cd /opt/vc/src/libs/ilclient && make`
+* compile hello_video `cd /opt/vc/src/hello_video && make`
+* compile wifibroadcast `cd <wifibroadcast_dir> && make`
 * run it `./tx` or `./rx` (see ./scripts/tx.sh for example)
   * ifconfig wlan0 down
   * iw dev wlan0 set monitor otherbss fcsfail
@@ -21,9 +24,12 @@ https://befinitiv.wordpress.com/
 * setup auto start (see ./scripts/systemd)
 
 ##Other Notes
+###testing in linux
+mplayer can play h264 from stdin: `mplayer - -fps 25`
+
 ###testing the TL-WN722N (AR9271 Rev:1) in Ubuntu
 ```
-ifconfig wlan0 up
+ifconfig wlan0 down
 iw dev wlan0 set monitor otherbss fcsfail
 ifconfig wlan0 up
 iwconfig wlan0 channel 11
