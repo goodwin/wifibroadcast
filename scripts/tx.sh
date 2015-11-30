@@ -4,7 +4,7 @@
 
 #adapt these to your needs
 NIC="wlan1"
-CHANNEL="6"
+CHANNEL="1"
 
 WIDTH=1280
 HEIGHT=720
@@ -30,6 +30,10 @@ if [[ $EUID -ne 0 ]]; then
    echo "This script must be run as root" 1>&2
    exit 1
 fi
+
+# kill shit
+pkill dhcpcd
+pkill ntpd
 
 #wait a bit. this help automatic starting
 sleep 2

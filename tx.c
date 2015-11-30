@@ -202,6 +202,7 @@ void pb_transmit_packet(pcap_t *ppcap, int seq_nr, uint8_t *packet_transmit_buff
     int plen = packet_length + packet_header_len + sizeof(wifi_packet_header_t);
     int r = pcap_inject(ppcap, packet_transmit_buffer, plen);
     if (r != plen) {
+	printf("fuck! pcap_inject() asked to send %d bytes, but returned %d\n", plen, r);
         pcap_perror(ppcap, "Trouble injecting packet");
         exit(1);
     }
