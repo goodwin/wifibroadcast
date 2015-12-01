@@ -2,7 +2,7 @@
 LDFLAGS=-lrt -lpcap
 CPPFLAGS=-Wall
 
-all: rx tx rx_status_test
+all: rx tx rx_status_test tx_test
 
 
 
@@ -17,6 +17,8 @@ rx: rx.o lib.o radiotap.o fec.o
 tx: tx.o lib.o fec.o
 	gcc -o $@ $^ $(LDFLAGS)
 
+tx_test: tx_test.o
+	gcc -o $@ $^ $(LDFLAGS)
 
 rx_status_test: rx_status_test.o
 	gcc -o $@ $^ $(LDFLAGS)
