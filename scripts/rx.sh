@@ -10,7 +10,8 @@ NICS=`ls /sys/class/net | grep wlan`
 SAVE_PATH="/media/usb0/video"
 
 WBC_PATH="/home/a/repos/lwerdna/wifibroadcast"
-DISPLAY_PROGRAM="/opt/vc/src/hello_pi/hello_video/hello_video.bin" 
+#DISPLAY_PROGRAM="/opt/vc/src/hello_pi/hello_video/hello_video.bin" 
+DISPLAY_PROGRAM="mplayer - -fps 48"
 
 
 ##################################
@@ -46,15 +47,16 @@ do
 done
 
 echo "Starting with recording"
-echo $WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS
-$WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS > ./save.rawvid
+#echo $WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS
+#$WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS > ./save.rawvid
 	
-#if [ -d "$SAVE_PATH" ]; then
-#	echo "Starting with recording"
-#	FILE_NAME=$SAVE_PATH/`ls $SAVE_PATH | wc -l`.rawvid
-#	$WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS | tee $FILE_NAME | $DISPLAY_PROGRAM
-#else
-#	echo "Starting without recording"
-#	$WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS | $DISPLAY_PROGRAM
-#fi
+if [ -d "$SAVE_PATH" ]; then
+	echo "Starting with recording"
+	FILE_NAME=$SAVE_PATH/`ls $SAVE_PATH | wc -l`.rawvid
+	$WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS | tee $FILE_NAME | $DISPLAY_PROGRAM
+else
+	echo "Starting without recording"
+	echo "$WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS | $DISPLAY_PROGRAM"
+	$WBC_PATH/rx -p $PORT -b $BLOCK_SIZE -r $FECS -f $PACKET_LENGTH $NICS | $DISPLAY_PROGRAM
+fi
 

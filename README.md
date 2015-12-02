@@ -16,6 +16,8 @@ https://befinitiv.wordpress.com/
 * compile lib ilclient `cd /opt/vc/src/libs/ilclient && make`
 * compile hello_video `cd /opt/vc/src/hello_video && make`
 * compile wifibroadcast `cd <wifibroadcast_dir> && make`
+* remove avahi-daemon `sudo apt-get remove avahi-daemon`
+* kill other interface meddling processes `pkill dhcpcd` `pkill ntpd`
 * run it `./tx` or `./rx` (see ./scripts/tx.sh for example)
   * ifconfig wlan0 down
   * iw dev wlan0 set monitor otherbss fcsfail
@@ -25,7 +27,13 @@ https://befinitiv.wordpress.com/
 
 ##Other Notes
 ###testing in linux
-mplayer can play h264 from stdin: `mplayer - -fps 25`
+mplayer can play h264 from stdin: `mplayer - -fps 48` (or whatever $FPS is defined in the scripts)
+
+###getting .config from running raspi board
+```
+sudo modprobe configs
+zcat /proc/config.gz
+```
 
 ###testing the TL-WN722N (AR9271 Rev:1) in Ubuntu
 ```
@@ -35,6 +43,7 @@ ifconfig wlan0 up
 iwconfig wlan0 channel 11
 ```
 and now verify packets using `tcpdump` or `wireshark`
+
 ###mounting partitions within raspi images
 * fdisk -l TX_2015-09-24-raspbian-jessie.img (should show FAT boot and Linux/ext4 system)
 * example:

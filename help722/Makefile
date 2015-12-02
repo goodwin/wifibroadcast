@@ -6,9 +6,9 @@ ifneq ($(KERNELRELEASE),)
 
 # we specify obj-m, the m meaning "build as a module" and list the name of resulting object
 # (which gets changed from .o -> .ko)
-obj-m  := spy.o 
+obj-m  := help722.o 
 # now we name <module>-objs to list the modules involved to make <module>
-spy-objs := main.o omni_linux_arm.o
+help722-objs := main.o omnihook.o
 else
  # Normal Makefile
 
