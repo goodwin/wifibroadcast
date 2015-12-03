@@ -824,8 +824,7 @@
 //	 ((_ah)->hw_version.macRev >= AR_SREV_REVISION_5416_22)) || 
 //	 ((_ah)->hw_version.macVersion >= AR_SREV_VERSION_9100))
 
-#define AR_SREV_9100(ah) \
-	((ah->hw_version.macVersion) == AR_SREV_VERSION_9100)
+#define AR_SREV_9100(ah) 0
 //#define AR_SREV_9100_OR_LATER(_ah) 
 //	(((_ah)->hw_version.macVersion >= AR_SREV_VERSION_9100))
 

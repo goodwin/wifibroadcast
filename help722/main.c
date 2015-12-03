@@ -11,6 +11,13 @@ char *
 reg_to_str(int offset)
 {
     switch(offset) {
+        case AR_RTC_SLEEP_CLK: return "AR_RTC_SLEEP_CLK";
+        case AR_RTC_PLL_CONTROL: return "AR_RTC_PLL_CONTROL";
+        case AR_RTC_RC: return "AR_RTC_RC";
+        case AR9271_GATE_MAC_CTL: return "AR9271_GATE_MAC_CTL";
+        case AR_INTR_SYNC_CAUSE: return "AR_INTR_SYNC_CAUSE";
+        case AR_RTC_FORCE_WAKE: return "AR_RTC_FORCE_WAKE";
+        case AR_CFG_LED: return "AR_CFG_LED";
         case AR_BSS_ID0: return "AR_BSS_ID0";
         case AR_BSS_ID1: return "AR_BSS_ID1";
         case AR_BCN_RSSI_AVE: return "AR_BCN_RSSI_AVE";
@@ -153,39 +160,33 @@ detour_ath9k_wmi_cmd(void *wmi, int cmd_id, void *cmd_buf, int cmd_len,
     int rc;
     char *cmd_str = wmi_to_str(cmd_id);
 
-    printk("%s\n", cmd_str);
-    goto pass_thru;
+    //printk("%s(%s, %p, %d)\n", __func__, cmd_str, cmd_buf, cmd_len);
 
     if(cmd_id == WMI_REG_RMW_CMDID) {
-        struct reg_rmw *x = (void *)cmd_buf;
-        x->reg = be32_to_cpu(x->reg);
-        x->set = be32_to_cpu(x->set);
-        x->clr = be32_to_cpu(x->clr);
+        struct reg_rmw x;
+        u32 reg, set, clr;
+        memcpy(&x, cmd_buf, sizeof(x));
+        reg = be32_to_cpu(x.reg);
+        set = be32_to_cpu(x.set);
+        clr = be32_to_cpu(x.clr);
         // skip GPIO led updates
-        if(x->reg == AR_GPIO_IN_OUT) goto pass_thru;
-        printk("%s (.reg=0x%s .set=%d .clr=%d)\n", cmd_str, reg_to_str(x->reg), x->set,
-            x->clr);
+        if(reg == AR_GPIO_IN_OUT) goto pass_thru;
+        printk("%s (.reg=%s .set=%d .clr=%d)\n", cmd_str, reg_to_str(reg), set,
+            clr);
     }
-
-    goto pass_thru;
-
-    if(cmd_id == WMI_REG_WRITE_CMDID) {
+    else if(cmd_id == WMI_REG_WRITE_CMDID) {
         int i;
         struct reg_write *x = (void *)cmd_buf;
         printk("%s writes %d registers\n", cmd_str, cmd_len/sizeof(struct reg_write));
-        x->reg = be32_to_cpu(x->reg);
-        x->val = be32_to_cpu(x->val);
-        //for(i=0; i<(cmd_len/sizeof(struct reg_write)); ++i)
-        //    printk("  %s=0x%X\n", reg_to_str(x->reg), x->val);
+        for(i=0; i<(cmd_len/sizeof(struct reg_write)); ++i)
+            printk("  %s=0x%X\n", reg_to_str(be32_to_cpu(x[i].reg)), be32_to_cpu(x[i].val));
     }
     else if(cmd_id == WMI_REG_READ_CMDID) {
         // do nothing, print after read succeeds
-        printk("%s\n", cmd_str);
     }
     else {
-        dump_stack();
-        printk("%s(wmi=%p, cmd_id=%d (\"%s\"), ...)\n", __func__, wmi, cmd_id, 
-            cmd_str);
+        //dump_stack();
+        printk("%s ???\n", cmd_str);
     }
 
     /* !!! call the real func !! */
@@ -194,8 +195,9 @@ detour_ath9k_wmi_cmd(void *wmi, int cmd_id, void *cmd_buf, int cmd_len,
         timeout);
 
     if(cmd_id == WMI_REG_READ_CMDID) {
-        printk("%s read 0x%X from %s\n", cmd_str, be32_to_cpu(*(unsigned int *)rsp_buf),
-            reg_to_str(be32_to_cpu(*(unsigned int *)cmd_buf)));
+        u32 result = be32_to_cpu(*(unsigned int *)rsp_buf);
+        u32 reg = be32_to_cpu(*(unsigned int *)cmd_buf);
+        printk("%s %s returns 0x%X\n", cmd_str, reg_to_str(reg), result);
     }
 
     return rc;
