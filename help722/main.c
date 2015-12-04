@@ -152,6 +152,9 @@ wmi_to_str(int cmd_id)
 int (*tramp_ath9k_wmi_cmd)(void *wmi, int cmd_id, void *cmd_buf, 
     int cmd_len, void *rsp_buf, int rsp_len, unsigned int timeout);
 
+int (*tramp_ath9k_htc_send_rate_cmd)(void *priv, 
+    struct ath9k_htc_target_rate *trate);
+
 /* detours */
 int 
 detour_ath9k_wmi_cmd(void *wmi, int cmd_id, void *cmd_buf, int cmd_len,
@@ -203,6 +206,33 @@ detour_ath9k_wmi_cmd(void *wmi, int cmd_id, void *cmd_buf, int cmd_len,
     return rc;
 }
 
+int 
+detour_ath9k_htc_send_rate_cmd(void *priv, struct ath9k_htc_target_rate *trate)
+{
+    int i;
+    struct ath9k_htc_rateset *legacy = &(trate->rates.legacy_rates);
+    struct ath9k_htc_rateset *hithru = &(trate->rates.ht_rates);
+
+    printk("%s()\n", __func__);
+
+    printk("sta_index: 0x%X\n", trate->sta_index);
+    printk("isnew: 0x%X\n", trate->isnew);
+    printk("capflags: 0x%X\n", be32_to_cpu(trate->capflags));
+
+    for(i=0; i<legacy->rs_nrates; ++i)
+        printk("legacy rate[%d] = 0x%X\n", i, legacy->rs_rates[i]);
+        
+    for(i=0; i<hithru->rs_nrates; ++i)
+        printk("hithru rate[%d] = 0x%X\n", i, hithru->rs_rates[i]);
+
+    dump_stack();
+
+    return tramp_ath9k_htc_send_rate_cmd(priv, trate);
+}
+
+/* main
+*/
+
 static int __init help722_init(void)
 {
     int rc = -1;
@@ -210,16 +240,16 @@ static int __init help722_init(void)
 
     printk("%s()\n", __func__);
 
-    /* resolve target function */
+    /* hooks */
     addr = kallsyms_lookup_name("ath9k_wmi_cmd");
-    if(!addr) { 
-        printk("ERROR: resolving ath9k_wmi_cmd()\n"); 
-        goto cleanup; 
-    }
-
-    /* hook it */
+    if(!addr) { printk("ERROR: resolving ath9k_wmi_cmd()\n"); goto cleanup; }
     omnihook_add((void *)addr, detour_ath9k_wmi_cmd, (void **)&tramp_ath9k_wmi_cmd);
 
+    addr = kallsyms_lookup_name("ath9k_htc_send_rate_cmd");
+    if(!addr) { printk("ERROR: resolving ath9k_htc_send_rate_cmd()\n"); goto cleanup; }
+    omnihook_add((void *)addr, detour_ath9k_htc_send_rate_cmd, (void **)&tramp_ath9k_htc_send_rate_cmd);
+
+    /* done */
     rc = 0;
 
     cleanup:

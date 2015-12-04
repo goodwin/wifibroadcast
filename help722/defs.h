@@ -33,6 +33,8 @@
 
 #define AR_GPIO_IN_OUT 0x4048
 
+#define ATH_HTC_RATE_MAX 30
+
 struct reg_write {
 	__be32 reg;
 	__be32 val;
@@ -43,4 +45,22 @@ struct reg_rmw {
 	__be32 set;
 	__be32 clr;
 } __packed;
+
+
+struct ath9k_htc_rateset {
+	u8 rs_nrates;
+	u8 rs_rates[ATH_HTC_RATE_MAX];
+};
+
+struct ath9k_htc_rate {
+	struct ath9k_htc_rateset legacy_rates;
+	struct ath9k_htc_rateset ht_rates;
+} __packed;
+
+struct ath9k_htc_target_rate {
+	u8 sta_index;
+	u8 isnew;
+	__be32 capflags;
+	struct ath9k_htc_rate rates;
+};
 
