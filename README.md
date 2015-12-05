@@ -1,11 +1,17 @@
 tinkering with befinitiv's wifibroadcast project
+* (send video thru 802.11 STA via packet injection, for RC FPV)
+* https://bitbucket.org/befi/wifibroadcast
+* https://befinitiv.wordpress.com/
 
-(send video thru 802.11 STA via packet injection, for RC FPV)
+##Added Features
+* careful backoff and retry when adapter falls behind pcap_inject()
+* enhanced timing stats (instantaneous and average kbps, mbit/s)
+* a driver that runtime patches ath9k_htc driver, the ath fw (work in progress)
+  * fw patch at fw load to insert new rate
+  * driver patch to up tx power to 30db
+  * change internal chipset register values for max throughput
 
-https://bitbucket.org/befi/wifibroadcast
-https://befinitiv.wordpress.com/
-
-##How?
+##How Does WifiBroadcast Work?
 * raspbian comes with a utility that reads video: raspivid
 * raspivid's output gets piped into the tx portion of this project
 
