@@ -3,7 +3,7 @@
 
 
 #adapt these to your needs
-NIC="wlan1"
+NIC="wlan0"
 CHANNEL="1"
 
 WIDTH=1280

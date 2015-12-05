@@ -2,7 +2,7 @@
 # tx script
 
 #adapt these to your needs
-NIC="wlan1"
+NIC="wlan0"
 CHANNEL="1"
 
 WIDTH=1280
@@ -22,6 +22,10 @@ PORT=0
 ##################################
 
 WBC_PATH="/home/pi/repos/lwerdna/wifibroadcast"
+
+#kill shit
+pkill dhcpcd
+pkill ntpd
 
 echo "updating wifi ($NIC, $CHANNEL)"
 ifconfig $NIC down

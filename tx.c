@@ -44,6 +44,7 @@ unsigned int g_bytes_sent_total = 0;
 unsigned int g_bytes_sent_last_report = 0;
 struct timeval g_time_start;
 struct timeval g_time_last_report;
+int g_retries = 0;
 
 /* this is the template radiotap header we send packets out with */
 
@@ -194,6 +195,9 @@ void fifo_create_select_set(fifo_t *fifo, int fifo_count, fd_set *fifo_set, int 
 
 
 void pb_transmit_packet(pcap_t *ppcap, int seq_nr, uint8_t *packet_transmit_buffer, int packet_header_len, const uint8_t *packet_data, int packet_length) {
+    int rtry_left = 8;
+    float delay = 0.1; // .1, .2, .4, ..., 2.56
+
     //add header outside of FEC
     wifi_packet_header_t *wph = (wifi_packet_header_t*)(packet_transmit_buffer + packet_header_len);
     wph->sequence_number = seq_nr;
@@ -202,22 +206,38 @@ void pb_transmit_packet(pcap_t *ppcap, int seq_nr, uint8_t *packet_transmit_buff
     memcpy(packet_transmit_buffer + packet_header_len + sizeof(wifi_packet_header_t), packet_data, packet_length);
 
     int plen = packet_length + packet_header_len + sizeof(wifi_packet_header_t);
-    int r = pcap_inject(ppcap, packet_transmit_buffer, plen);
-    if (r != plen) {
-        printf("fuck! pcap_inject() asked to send %d bytes, but returned %d\n", plen, r);
-        pcap_perror(ppcap, "Trouble injecting packet");
-        exit(1);
-    }
-    else {
-        g_pkts_sent_total += 1;
-        g_bytes_sent_total += packet_length;
-        g_bytes_sent_last_report += packet_length;
-    }
 
+    while(1) {
+        int r = pcap_inject(ppcap, packet_transmit_buffer, plen);
+        if (r != plen) {
+            struct timeval t_err, t_now;
+
+            if(!rtry_left) { 
+                printf("fuck! pcap_inject() asked to send %d bytes, but returned %d\n", plen, r);
+                pcap_perror(ppcap, "Trouble injecting packet");
+                exit(1);
+            }
+
+            printf("inject failure, but %d retries remain\n", rtry_left);
+            printf("spinning for %f seconds..\n", delay);
+
+            TIME_SAMPLE(t_err);
+            do {
+                TIME_SAMPLE(t_now);
+            } while(TIME_DIFF(t_now, t_err) < delay);
+
+            rtry_left -= 1;
+            delay *= 2;
+            g_retries += 1;
+        }
+        else {
+            g_pkts_sent_total += 1;
+            g_bytes_sent_total += packet_length;
+            g_bytes_sent_last_report += packet_length;
+            break;
+        }
+    }
 }
-
-
-
 
 void pb_transmit_block(packet_buffer_t *pbl, pcap_t *ppcap, int *seq_nr, int port, int packet_length, uint8_t *packet_transmit_buffer, int packet_header_len, int data_packets_per_block, int fec_packets_per_block, int transmission_count) {
     int i;
@@ -476,14 +496,14 @@ main(int argc, char *argv[])
         delta_start = TIME_DIFF(now, g_time_start);
         delta_report = TIME_DIFF(now, g_time_last_report);
 
-        if(report_due && (delta_start < 10000000 || delta_report > 10000000)) {
+        if(report_due && delta_report > 1) {
             float bytes_per_sec_avg = g_bytes_sent_total / delta_start;
             float mbit_per_sec_avg = 8*bytes_per_sec_avg / (1024*1024);
             float bytes_per_sec_inst = g_bytes_sent_last_report / delta_report;
             float mbit_per_sec_inst = 8*bytes_per_sec_inst / (1024*1024);
             
-            printf("t:%f pkts:%d,bytes:%d CUR:bytes/s:%.2f,mbit/s:%.2f AVG:bytes/s:%.2f,mbit/s:%.2f)\n",
-                delta_start,
+            printf("t:%.1f rtry:%d pkts:%d,byt:%d CUR:byt/s:%.1f,mbit/s:%.1f AVG:byt/s:%.1f,mbit/s:%.1f\n",
+                delta_start, g_retries,
                 g_pkts_sent_total, g_bytes_sent_total, bytes_per_sec_inst, mbit_per_sec_inst, bytes_per_sec_avg, mbit_per_sec_avg);
 
             /* reset */
